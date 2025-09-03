@@ -18,8 +18,12 @@ namespace MometBank.DataAccess.Models
         public string OriginalFileName { get; set; }
         public float FileSize { get; set; }
         public byte[] Thumbnail { get; set; }
+        public string Details { get; set; }
+        public long? FolderId { get; set; }
 
         public virtual ICollection<ModelTag> ModelTags { get; set; }
+        public virtual ICollection<Gcode> Gcodes { get; set; }
+        public virtual Folder Folder { get; set; }
 
         [NotMapped]
         public BitmapImage ThumbnailImage
