@@ -1,2 +1,2 @@
 Todo
-1- Add Gcode files support for print basicly (with tags)
+1- Klasörler için listenin üstüne yatay şekilde sayfalama işlevi bulunan bir liste sağ tarafa ileri ve geri sayfaları ve yeni klasör eklemek için butonlar
