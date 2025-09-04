@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace MometBank.UI.Views
 {
@@ -18,6 +19,17 @@ namespace MometBank.UI.Views
         private int _currentPage = 1;
         private int _totalPages = 1;
         private const int PageSize = 12;
+
+        public ObservableCollection<Folder> PagedFolders { get; set; } = new();
+
+        private int _currentFolderPage = 1;
+        private int _totalFolderPages = 1;
+        private const int FolderPageSize = 8;
+
+        private Folder _currentFolder;
+        public string CurrentFolderName => _currentFolder?.Name ?? "Kök";
+
+        public string FolderPageInfo => $"Klasör Sayfa {_currentFolderPage} / {_totalFolderPages}";
 
         public ObservableCollection<Model> PagedModels { get; set; } = new();
 
@@ -76,13 +88,16 @@ namespace MometBank.UI.Views
             InitializeComponent();
             DataContext = this;
             _ = LoadModelsAsync();
+            _ = LoadItemsAsync();
         }
 
         private async Task LoadModelsAsync()
         {
+            long? currentFolderId = _currentFolder?.Id ?? null;
             var query = _context.Models
                 .Include(m => m.ModelTags)
                     .ThenInclude(mt => mt.Tag)
+                    .Where(m => m.FolderId == currentFolderId)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(TagSearchText))
@@ -159,6 +174,7 @@ namespace MometBank.UI.Views
             if (window.ShowDialog() == true)
             {
                 var model = window.CreatedModel;
+                model.FolderId = _currentFolder?.Id ?? null;
                 if (model != null)
                 {
                     _context.Models.Add(model);
@@ -202,6 +218,85 @@ namespace MometBank.UI.Views
             }
         }
 
+        private async Task LoadItemsAsync()
+        {
+            var folderQuery = _context.Folders
+                .AsQueryable();
+            var totalFolders = await folderQuery.CountAsync();
+            _totalFolderPages = (int)Math.Ceiling(totalFolders / (double)FolderPageSize);
+            if (_totalFolderPages == 0) _totalFolderPages = 1;
+            if (_currentFolderPage > _totalFolderPages)
+                _currentFolderPage = _totalFolderPages;
+            var pagedFolders = await folderQuery
+                .OrderBy(f => f.Name)
+                .Skip((_currentFolderPage - 1) * FolderPageSize)
+                .Take(FolderPageSize)
+                .ToListAsync();
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                PagedFolders.Clear();
+                foreach (var folder in pagedFolders)
+                {
+                    PagedFolders.Add(folder);
+                }
+                OnPropertyChanged(nameof(PagedFolders));
+                OnPropertyChanged(nameof(CurrentFolderName));
+                OnPropertyChanged(nameof(FolderPageInfo));
+            });
+            await LoadModelsAsync();
+        }
+
+
+        private async void NextFolderPageButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentFolderPage < _totalFolderPages)
+            {
+                _currentFolderPage++;
+                await LoadItemsAsync();
+            }
+        }
+
+        private async void PreviousFolderPageButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentFolderPage > 1)
+            {
+                _currentFolderPage--;
+                await LoadItemsAsync();
+            }
+        }
+
+        private async void FolderItem_DoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if ((sender as FrameworkElement)?.DataContext is Folder folder)
+            {
+                _currentFolder = folder;
+                OnPropertyChanged(nameof(CurrentFolderName));
+                _currentFolderPage = 1;
+                await LoadModelsAsync();
+            }
+        }
+
+        private async void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            _currentFolder = null;
+            OnPropertyChanged(nameof(CurrentFolderName));
+            await LoadModelsAsync();
+        }
+
+        private async void NewFolderButton_Click(object sender, RoutedEventArgs e)
+        {
+            var window = new AddFolderWindow(_context);
+            if (window.ShowDialog() == true)
+            {
+                await LoadItemsAsync();
+            }
+        }
+        
+        private async void TagsMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            new EditTagsWindow().ShowDialog();
+        }
 
         // === INotifyPropertyChanged ===
         public event PropertyChangedEventHandler PropertyChanged;

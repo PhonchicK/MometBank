@@ -17,7 +17,7 @@ namespace MometBank.DataAccess.Models
         public long? ModelId { get; set; }
         public long? FolderId { get; set; }
 
-        public virtual Model Model { get; set; }
-        public virtual Folder Folder { get; set; }
+        public virtual Model? Model { get; set; }
+        public virtual Folder? Folder { get; set; }
     }
 }

@@ -51,46 +51,67 @@
         <StackPanel Grid.Column="0" Margin="10">
             <Border CornerRadius="10" Background="White" Padding="10" Margin="0,0,0,20">
                 <Image Width="220" Height="220" Stretch="Uniform"
-                       Source="{Binding ThumbnailImage}" />
+                       Source="{Binding Model.ThumbnailImage}" />
             </Border>
 
             <TextBlock Text="Dosya:" FontWeight="Bold"/>
-            <TextBlock Text="{Binding OriginalFileName}" Foreground="Gray" Margin="0,0,0,10"/>
+            <TextBlock Text="{Binding Model.OriginalFileName}" Foreground="Gray" Margin="0,0,0,10"/>
 
             <TextBlock Text="Boyut:" FontWeight="Bold"/>
-            <TextBlock Text="{Binding FileSize}" Foreground="Gray" Margin="0,0,0,10"/>
+            <TextBlock Text="{Binding Model.FileSize}" Foreground="Gray" Margin="0,0,0,10"/>
 
             <TextBlock Text="Oluşturulma:" FontWeight="Bold"/>
-            <TextBlock Text="{Binding CreatedTime}" Foreground="Gray"/>
+            <TextBlock Text="{Binding Model.CreatedTime}" Foreground="Gray"/>
         </StackPanel>
 
         <!-- Sağ panel: düzenlenebilir alanlar -->
         <StackPanel Grid.Column="1" Margin="20,0,0,0">
             <TextBlock Text="Model Adı" FontWeight="Bold"/>
-            <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
+            <TextBox Text="{Binding Model.Name, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
 
             <TextBlock Text="Açıklama" FontWeight="Bold"/>
-            <TextBox Text="{Binding Details, UpdateSourceTrigger=PropertyChanged}" 
+            <TextBox Text="{Binding Model.Details, UpdateSourceTrigger=PropertyChanged}" 
                      Margin="0,0,0,10" Height="100" TextWrapping="Wrap" AcceptsReturn="True"/>
 
-            <TextBlock Text="Taglar" FontWeight="Bold"/>
-            <ItemsControl ItemsSource="{Binding ModelTags}" Margin="0,0,0,10">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border Background="#E3F2FD" CornerRadius="5" Margin="2" Padding="5">
-                            <TextBlock Text="{Binding Tag.Name}" Foreground="#1976D2"/>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
+            <GroupBox Header="Taglar" Grid.Row="1" Margin="10">
+                <StackPanel>
+                    <!-- WrapPanel ile çok sütunlu görünüm -->
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Height="100">
+                        <ItemsControl ItemsSource="{Binding PagedTags}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox Content="{Binding Tag.Name}" Width="100"
+                                  IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                  Margin="8" Padding="6"
+                                  FontSize="14" VerticalContentAlignment="Center">
+                                        <CheckBox.ToolTip>
+                                            <TextBlock Text="{Binding Tag.Name}" TextWrapping="Wrap"/>
+                                        </CheckBox.ToolTip>
+                                    </CheckBox>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <!-- Pagination -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+                        <Button Content="‹ Önceki" Width="100" Margin="5"
+                    Click="PreviousPage_Click"/>
+                        <TextBlock Text="{Binding PageInfo}" VerticalAlignment="Center"
+                       FontWeight="SemiBold" FontSize="14" Margin="20,0"/>
+                        <Button Content="Sonraki ›" Width="100" Margin="5"
+                    Click="NextPage_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
 
             <TextBlock Text="Gcode Dosyaları" FontWeight="Bold"/>
-            <ListBox ItemsSource="{Binding Gcodes}" DisplayMemberPath="FileName" Height="120"/>
+            <ListBox ItemsSource="{Binding Model.Gcodes}" DisplayMemberPath="FileName" Height="120"/>
         </StackPanel>
 
         <!-- Alt butonlar -->

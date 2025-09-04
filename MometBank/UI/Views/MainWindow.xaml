@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MometBank" Height="700" Width="900"
         Background="#F0F2F5"
-        WindowStartupLocation="CenterScreen"
+        WindowStartupLocation="CenterScreen" 
         FontFamily="Segoe UI">
 
     <Window.Resources>
@@ -89,114 +89,186 @@
             </Style.Triggers>
         </Style>
     </Window.Resources>
+    <DockPanel>
+        <ToolBar x:Name="toolBar" HorizontalAlignment="Stretch" VerticalAlignment="Top" DockPanel.Dock="Top">
+            <MenuItem Header="Tag Düzenle" Click="TagsMenuItem_Click"/>
+        </ToolBar>
+        <Grid Margin="20"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
 
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <!-- Header -->
+                <RowDefinition Height="*"/>
+                <!-- Content -->
+                <RowDefinition Height="Auto"/>
+                <!-- Pagination -->
+            </Grid.RowDefinitions>
+
             <!-- Header -->
-            <RowDefinition Height="*"/>
-            <!-- Content -->
-            <RowDefinition Height="Auto"/>
-            <!-- Pagination -->
-        </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-        <!-- Header -->
-        <Grid Grid.Row="0" Margin="0,0,0,20">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+                <!-- Search Box -->
+                <DockPanel Grid.Column="0">
+                    <TextBox Width="300" Height="36"
+                     VerticalContentAlignment="Center"
+                     Text="{Binding TagSearchText, UpdateSourceTrigger=PropertyChanged}"
+                     FontSize="14"
+                     Padding="30,0,0,0"
+                     Margin="0,0,10,0"/>
 
-            <!-- Search Box -->
-            <DockPanel Grid.Column="0">
-                <TextBox Width="300" Height="36"
-                         VerticalContentAlignment="Center"
-                         Text="{Binding TagSearchText, UpdateSourceTrigger=PropertyChanged}"
-                         FontSize="14"
-                         Padding="30,0,0,0"
-                         Margin="0,0,10,0"/>
+                    <!-- Search Icon -->
+                    <TextBlock Text="🔍" VerticalAlignment="Center"
+                       Margin="5,0,0,0"
+                       Foreground="Gray"/>
+                    <!-- Search Mode Dropdown -->
+                    <ComboBox Width="150" Height="36"
+                      VerticalContentAlignment="Center"
+                      Margin="0,0,10,0"
+                      SelectedIndex="0"
+                      SelectedItem="{Binding SelectedSearchMode, Mode=TwoWay}">
+                        <ComboBoxItem Content="Genel" />
+                        <ComboBoxItem Content="İsim" />
+                        <ComboBoxItem Content="Açıklama" />
+                        <ComboBoxItem Content="Tag" />
+                    </ComboBox>
+                    <ComboBox Width="150" Height="36"
+                      VerticalContentAlignment="Center"
+                      Margin="0,0,10,0"
+                      SelectedIndex="0"
+                      SelectedItem="{Binding SelectedGcodeFilter, Mode=TwoWay}">
+                        <ComboBoxItem Content="Tümü" />
+                        <ComboBoxItem Content="Gcode Var" />
+                        <ComboBoxItem Content="Gcode Yok" />
+                    </ComboBox>
+                </DockPanel>
 
-                <!-- Search Icon -->
-                <TextBlock Text="🔍" VerticalAlignment="Center"
-                           Margin="5,0,0,0"
-                           Foreground="Gray"/>
-                <!-- Search Mode Dropdown -->
-                <ComboBox Width="150" Height="36"
-                          VerticalContentAlignment="Center"
-                          Margin="0,0,10,0"
-                          SelectedIndex="0"
-                          SelectedItem="{Binding SelectedSearchMode, Mode=TwoWay}">
-                    <ComboBoxItem Content="Genel" />
-                    <ComboBoxItem Content="İsim" />
-                    <ComboBoxItem Content="Açıklama" />
-                    <ComboBoxItem Content="Tag" />
-                </ComboBox>
-                <ComboBox Width="150" Height="36"
-                          VerticalContentAlignment="Center"
-                          Margin="0,0,10,0"
-                          SelectedIndex="0"
-                          SelectedItem="{Binding SelectedGcodeFilter, Mode=TwoWay}">
-                    <ComboBoxItem Content="Tümü" />
-                    <ComboBoxItem Content="Gcode Var" />
-                    <ComboBoxItem Content="Gcode Yok" />
-                </ComboBox>
-            </DockPanel>
+                <!-- Right buttons -->
+                <StackPanel Orientation="Horizontal" Grid.Column="1">
+                    <Button Content="Filtrele" Style="{StaticResource ModernButton}"
+                    Click="FilterButton_Click"/>
+                </StackPanel>
+            </Grid>
 
-            <!-- Right buttons -->
-            <StackPanel Orientation="Horizontal" Grid.Column="1">
-                <Button Content="Filtrele" Style="{StaticResource ModernButton}"
-                        Click="FilterButton_Click"/>
+            <!-- Folders Section -->
+            <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,0,0,10">
+                <!-- Üst Satır: Klasör Listesi -->
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                    <ItemsControl ItemsSource="{Binding PagedFolders}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource ModelCardStyle}" Width="120" Height="60"
+                        Margin="5"
+                        MouseLeftButtonDown="FolderItem_DoubleClick">
+                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <TextBlock Text="📁" FontSize="16" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="14"
+                                   HorizontalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <!-- Alt Satır: Navigation & Actions -->
+                <DockPanel Margin="0,10,0,0">
+
+                    <!-- Spacer -->
+                    <DockPanel.Resources>
+                        <Style TargetType="DockPanel">
+                            <Setter Property="LastChildFill" Value="False"/>
+                        </Style>
+                    </DockPanel.Resources>
+
+                    <!-- Geri Tuşu -->
+                    <Button Content="⬅"  Style="{StaticResource ModernButton}"
+            DockPanel.Dock="Left" Click="BackButton_Click" Width="60"/>
+
+                    <!-- Açık klasör adı -->
+                    <TextBlock Text="{Binding CurrentFolderName}" 
+               VerticalAlignment="Center" FontWeight="Bold" FontSize="14"
+               Margin="10,0,0,0" DockPanel.Dock="Left"/>
+
+                    <!-- Sayfa Bilgisi -->
+                    <TextBlock Text="{Binding FolderPageInfo}" 
+               VerticalAlignment="Center" FontSize="14" 
+               Margin="20,0,0,0" DockPanel.Dock="Left"/>
+
+                    <!-- Yeni Klasör Butonu -->
+                    <Button Content="＋ Klasör" Style="{StaticResource ModernButton}"
+            DockPanel.Dock="Right" Click="NewFolderButton_Click"/>
+
+                    <!-- Sonraki Sayfa -->
+                    <Button Content="›" Style="{StaticResource ModernButton}" Width="40"
+            DockPanel.Dock="Right" Click="NextFolderPageButton_Click"/>
+
+                    <!-- Önceki Sayfa -->
+                    <Button Content="‹" Style="{StaticResource ModernButton}" Width="40"
+            DockPanel.Dock="Right" Click="PreviousFolderPageButton_Click"/>
+                </DockPanel>
             </StackPanel>
+            <!-- Models List -->
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding PagedModels}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel IsItemsHost="True" Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource ModelCardStyle}" Width="200" Height="260">
+                                <StackPanel>
+                                    <Image Width="160" Height="160" Stretch="Uniform"
+                                   Margin="0,0,0,10"
+                                   Source="{Binding Thumbnail, Converter={StaticResource ByteArrayToImageConverter}}"
+                                   HorizontalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Name}" 
+                                       FontWeight="SemiBold" FontSize="16"
+                                       TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding OriginalFileName}" 
+                                       Foreground="Gray" FontSize="12"
+                                       TextTrimming="CharacterEllipsis"/>
+                                    <Button Content="Detay" 
+                                    Style="{StaticResource ModernButton}"
+                                    Margin="0,8,0,0"
+                                    Click="DetailsButton_Click"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- Pagination -->
+            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+                <Button Content="‹ Önceki" Style="{StaticResource ModernButton}" Width="100"
+                Click="PreviousPageButton_Click"/>
+                <TextBlock Text="{Binding PageInfo}" VerticalAlignment="Center"
+                   FontWeight="SemiBold" FontSize="14" Margin="20,0"/>
+                <Button Content="Sonraki ›" Style="{StaticResource ModernButton}" Width="100"
+                Click="NextPageButton_Click"/>
+            </StackPanel>
+
+            <!-- Floating Add Button -->
+            <Button Content="＋"
+            Style="{StaticResource FloatingActionButton}"
+            Grid.RowSpan="4"
+            Click="NewButton_Click"/>
         </Grid>
+    </DockPanel>
 
-        <!-- Models List -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{Binding PagedModels}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel IsItemsHost="True" Orientation="Horizontal"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border Style="{StaticResource ModelCardStyle}" Width="200" Height="260">
-                            <StackPanel>
-                                <Image Width="160" Height="160" Stretch="Uniform"
-                                       Margin="0,0,0,10"
-                                       Source="{Binding Thumbnail, Converter={StaticResource ByteArrayToImageConverter}}"
-                                       HorizontalAlignment="Center"/>
-                                <TextBlock Text="{Binding Name}" 
-                                           FontWeight="SemiBold" FontSize="16"
-                                           TextTrimming="CharacterEllipsis"/>
-                                <TextBlock Text="{Binding OriginalFileName}" 
-                                           Foreground="Gray" FontSize="12"
-                                           TextTrimming="CharacterEllipsis"/>
-                                <Button Content="Detay" 
-                                        Style="{StaticResource ModernButton}"
-                                        Margin="0,8,0,0"
-                                        Click="DetailsButton_Click"/>
-                            </StackPanel>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
-
-        <!-- Pagination -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
-            <Button Content="‹ Önceki" Style="{StaticResource ModernButton}" Width="100"
-                    Click="PreviousPageButton_Click"/>
-            <TextBlock Text="{Binding PageInfo}" VerticalAlignment="Center"
-                       FontWeight="SemiBold" FontSize="14" Margin="20,0"/>
-            <Button Content="Sonraki ›" Style="{StaticResource ModernButton}" Width="100"
-                    Click="NextPageButton_Click"/>
-        </StackPanel>
-
-        <!-- Floating Add Button -->
-        <Button Content="＋"
-                Style="{StaticResource FloatingActionButton}"
-                Grid.RowSpan="3"
-                Click="NewButton_Click"/>
-    </Grid>
 </Window>
