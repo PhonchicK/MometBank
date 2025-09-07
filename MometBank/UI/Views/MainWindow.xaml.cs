@@ -21,6 +21,8 @@ namespace MometBank.UI.Views
         private const int PageSize = 12;
 
         public ObservableCollection<Folder> PagedFolders { get; set; } = new();
+        public ObservableCollection<Gcode> CurrentFolderGcodes { get; set; } = new();
+
 
         private int _currentFolderPage = 1;
         private int _totalFolderPages = 1;
@@ -161,6 +163,26 @@ namespace MometBank.UI.Views
             });
         }
 
+        private async Task LoadFolderGcodesAsync()
+        {
+            CurrentFolderGcodes.Clear();
+
+            if (_currentFolder == null)
+                return;
+
+            var gcodes = await _context.Gcodes
+                .Where(g => g.FolderId == _currentFolder.Id)
+                .OrderBy(g => g.FileName)
+                .ToListAsync();
+
+            foreach (var gcode in gcodes)
+            {
+                CurrentFolderGcodes.Add(gcode);
+            }
+
+            OnPropertyChanged(nameof(CurrentFolderGcodes));
+        }
+
         // === Buton Eventleri ===
         private async void FilterButton_Click(object sender, RoutedEventArgs e)
         {
@@ -274,6 +296,7 @@ namespace MometBank.UI.Views
                 OnPropertyChanged(nameof(CurrentFolderName));
                 _currentFolderPage = 1;
                 await LoadModelsAsync();
+                await LoadFolderGcodesAsync();
             }
         }
 
@@ -282,6 +305,7 @@ namespace MometBank.UI.Views
             _currentFolder = null;
             OnPropertyChanged(nameof(CurrentFolderName));
             await LoadModelsAsync();
+            await LoadFolderGcodesAsync();
         }
 
         private async void NewFolderButton_Click(object sender, RoutedEventArgs e)
@@ -296,6 +320,14 @@ namespace MometBank.UI.Views
         private async void TagsMenuItem_Click(object sender, RoutedEventArgs e)
         {
             new EditTagsWindow().ShowDialog();
+        }
+
+        private void GcodeMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if ((sender as MenuItem)?.DataContext is Gcode gcode)
+            {
+                new GcodeDetailsWindow(gcode, _context).ShowDialog();
+            }
         }
 
         // === INotifyPropertyChanged ===

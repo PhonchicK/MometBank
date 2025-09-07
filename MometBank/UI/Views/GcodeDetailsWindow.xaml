@@ -1,0 +1,81 @@
+﻿<Window x:Class="MometBank.UI.Views.GcodeDetailsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Gcode Detayları" Height="400" Width="700"
+        WindowStartupLocation="CenterScreen"
+        Background="#F0F2F5"
+        FontFamily="Segoe UI">
+    <Window.Resources>
+        <!-- Modern Button -->
+        <Style TargetType="Button" x:Key="ModernButton">
+            <Setter Property="Background" Value="#2196F3"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#1976D2"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <!-- Başlık -->
+        <TextBlock Text="Gcode Düzenleme" 
+                   FontSize="20" FontWeight="Bold"
+                   Margin="0,0,0,20"/>
+
+        <!-- İçerik -->
+        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,0,0,20">
+            <TextBlock Text="Dosya Adı:" FontWeight="Bold"/>
+            <TextBox Text="{Binding Gcode.FileName, UpdateSourceTrigger=PropertyChanged}" 
+                     Margin="0,0,0,10"/>
+
+            <TextBlock Text="Dosya Yolu:" FontWeight="Bold"/>
+            <TextBox Text="{Binding Gcode.FilePath, UpdateSourceTrigger=PropertyChanged}" 
+                     Margin="0,0,0,10"/>
+
+            <TextBlock Text="Açıklama:" FontWeight="Bold"/>
+            <TextBox Text="{Binding Gcode.Description, UpdateSourceTrigger=PropertyChanged}" 
+                     Height="80" AcceptsReturn="True" TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <!-- Butonlar -->
+        <DockPanel Grid.Row="2">
+            <!-- Sol: Kaydet & Sil -->
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                <Button Content="Kaydet" Style="{StaticResource ModernButton}" 
+                        Width="100" Click="SaveButton_Click"/>
+                <Button Content="Sil" Style="{StaticResource ModernButton}" 
+                        Width="100" Background="Red" Click="DeleteButton_Click"/>
+            </StackPanel>
+
+            <!-- Sağ: Varsayılan uygulamada aç -->
+            <Button Content="Varsayılan Uygulamada Aç" 
+                    Style="{StaticResource ModernButton}" 
+                    Width="200" HorizontalAlignment="Right"
+                    DockPanel.Dock="Right"
+                    Click="OpenDefaultButton_Click"/>
+        </DockPanel>
+    </Grid>
+</Window>

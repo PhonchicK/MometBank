@@ -15,7 +15,7 @@
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="10,6"/>
             <Setter Property="Margin" Value="5"/>
-            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property ="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -92,6 +92,13 @@
     <DockPanel>
         <ToolBar x:Name="toolBar" HorizontalAlignment="Stretch" VerticalAlignment="Top" DockPanel.Dock="Top">
             <MenuItem Header="Tag Düzenle" Click="TagsMenuItem_Click"/>
+            <MenuItem Header="Gcode" ItemsSource="{Binding CurrentFolderGcodes}">
+                <MenuItem.ItemTemplate>
+                    <DataTemplate>
+                        <MenuItem Header="{Binding FileName}" Click="GcodeMenuItem_Click"/>
+                    </DataTemplate>
+                </MenuItem.ItemTemplate>
+            </MenuItem>
         </ToolBar>
         <Grid Margin="20"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
 
