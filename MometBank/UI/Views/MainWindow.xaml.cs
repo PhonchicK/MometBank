@@ -4,6 +4,7 @@ using MometBank.DataAccess.Models;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -329,6 +330,100 @@ namespace MometBank.UI.Views
                 new GcodeDetailsWindow(gcode, _context).ShowDialog();
             }
         }
+        private void MainWindow_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effects = DragDropEffects.Copy;
+            }
+            else
+            {
+                e.Effects = DragDropEffects.None;
+            }
+        }
+
+        private async void MainWindow_Drop(object sender, DragEventArgs e)
+        {
+            if (!e.Data.GetDataPresent(DataFormats.FileDrop))
+                return;
+
+            var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if (files == null || files.Length == 0) return;
+
+            foreach (var file in files)
+            {
+                string extension = Path.GetExtension(file).ToLowerInvariant();
+
+                if (extension == ".stl" || extension == ".3mf")
+                {
+                    await HandleModelFileDropAsync(file);
+                }
+                else if (extension == ".gcode")
+                {
+                    await HandleGcodeFileDropAsync(file);
+                }
+                else
+                {
+                    MessageBox.Show($"Bu dosya desteklenmiyor: {file}");
+                }
+            }
+        }
+
+        // === MODEL DOSYASI ASYNC ===
+        private async Task HandleModelFileDropAsync(string filePath)
+        {
+            try
+            {
+                AddModelWindow addModelWindow = new AddModelWindow(filePath);
+                if (addModelWindow.ShowDialog() != true)
+                    return;
+                addModelWindow.CreatedModel.FolderId = _currentFolder?.Id;
+                _context.Models.Add(addModelWindow.CreatedModel);
+                await _context.SaveChangesAsync();
+
+                await LoadModelsAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Model eklenirken hata: {ex.Message}");
+            }
+        }
+
+        // === GCODE DOSYASI ASYNC ===
+        private async Task HandleGcodeFileDropAsync(string filePath)
+        {
+            try
+            {
+                if (_currentFolder == null)
+                {
+                    MessageBox.Show("Lütfen bir klasör seçin.");
+                    return;
+                }
+
+                // 🪟 Kullanıcıya pencere aç - ek bilgileri alsın
+                var window = new AddGcodeWindow(filePath)
+                {
+                    Owner = this
+                };
+                if (window.ShowDialog() == true)
+                {
+                    var gcode = window.CreatedGcode;
+
+                    // FolderId dışarıdan atanıyor
+                    gcode.FolderId = _currentFolder.Id;
+
+                    _context.Gcodes.Add(gcode);
+                    await _context.SaveChangesAsync();
+
+                    await LoadFolderGcodesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Gcode eklenirken hata: {ex.Message}");
+            }
+        }
+
 
         // === INotifyPropertyChanged ===
         public event PropertyChangedEventHandler PropertyChanged;

@@ -17,9 +17,30 @@ namespace MometBank.UI.Views
         private string selectedFilePath;
         private Model3DGroup currentModel;
 
-        public AddModelWindow()
+        public AddModelWindow(string selectedFile = null)
         {
             InitializeComponent();
+
+            if(selectedFile != null)
+            {
+                selectedFilePath = selectedFile;
+                FileNameTextBlock.Text = System.IO.Path.GetFileName(selectedFilePath);
+                var reader = new StLReader();
+                try
+                {
+                    currentModel = reader.Read(selectedFilePath);
+                    Viewport.Children.Clear();
+                    Viewport.Children.Add(new SunLight());
+                    Viewport.Children.Add(new ModelVisual3D { Content = currentModel });
+                    Viewport.ZoomExtents();
+                    ModelNameTextBox.Text = Path.GetFileNameWithoutExtension(selectedFilePath);
+                    this.CreatedModel = new Model();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Model yüklenirken hata: " + ex.Message);
+                }
+            }
         }
 
         private void SelectFile_Click(object sender, RoutedEventArgs e)

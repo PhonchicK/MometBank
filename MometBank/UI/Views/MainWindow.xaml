@@ -100,8 +100,10 @@
                 </MenuItem.ItemTemplate>
             </MenuItem>
         </ToolBar>
-        <Grid Margin="20"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-
+        <Grid Margin="20"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+              AllowDrop="True"
+              DragOver="Window_DragOver"
+              Drop="Window_Drop">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
