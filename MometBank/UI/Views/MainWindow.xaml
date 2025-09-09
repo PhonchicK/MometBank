@@ -102,7 +102,7 @@
         </ToolBar>
         <Grid Margin="20"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
               AllowDrop="True"
-              DragOver="Window_DragOver"
+              DragEnter="Window_DragEnter"
               Drop="Window_Drop">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>

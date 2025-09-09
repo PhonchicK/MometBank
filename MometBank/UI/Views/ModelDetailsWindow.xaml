@@ -4,7 +4,10 @@
         Title="Model Detayları" Height="600" Width="900"
         WindowStartupLocation="CenterScreen"
         Background="#F0F2F5"
-        FontFamily="Segoe UI">
+        FontFamily="Segoe UI"
+        AllowDrop="True"
+        Drop="Window_Drop"
+        DragOver="Window_DragOver">
     <Window.Resources>
         <!-- Modern Button -->
         <Style TargetType="Button" x:Key="ModernButton">

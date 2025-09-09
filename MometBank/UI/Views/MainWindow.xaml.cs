@@ -330,7 +330,7 @@ namespace MometBank.UI.Views
                 new GcodeDetailsWindow(gcode, _context).ShowDialog();
             }
         }
-        private void MainWindow_DragEnter(object sender, DragEventArgs e)
+        private void Window_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
@@ -342,7 +342,7 @@ namespace MometBank.UI.Views
             }
         }
 
-        private async void MainWindow_Drop(object sender, DragEventArgs e)
+        private async void Window_Drop(object sender, DragEventArgs e)
         {
             if (!e.Data.GetDataPresent(DataFormats.FileDrop))
                 return;

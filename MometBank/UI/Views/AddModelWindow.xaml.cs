@@ -81,10 +81,10 @@ namespace MometBank.UI.Views
                 MessageBox.Show("Lütfen model adı girin ve dosya seçin.");
                 return;
             }
-
+            Viewport.ShowViewCube = false;
             var bmp = new RenderTargetBitmap((int)Viewport.ActualWidth, (int)Viewport.ActualHeight, 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
             bmp.Render(Viewport);
-
+            
             var encoder = new PngBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(bmp));
 
@@ -93,6 +93,8 @@ namespace MometBank.UI.Views
                 encoder.Save(stream);
                 CreatedModel.Thumbnail = stream.ToArray();
             }
+
+            Viewport.ShowViewCube = true;
 
             var modelsDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Models");
             if (!Directory.Exists(modelsDirectory))

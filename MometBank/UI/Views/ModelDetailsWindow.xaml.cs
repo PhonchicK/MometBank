@@ -2,6 +2,7 @@
 using MometBank.DataAccess;
 using MometBank.DataAccess.Models;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Windows;
 
 namespace MometBank.UI.Views
@@ -128,6 +129,62 @@ namespace MometBank.UI.Views
         {
             DialogResult = false;
             Close();
+        }
+
+        private void Window_DragOver(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effects = DragDropEffects.Copy;
+            else
+                e.Effects = DragDropEffects.None;
+
+            e.Handled = true;
+        }
+
+        private async void Window_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                foreach (var file in files)
+                {
+                    if (Path.GetExtension(file).Equals(".gcode", StringComparison.OrdinalIgnoreCase))
+                    {
+                        await AddGcodeAsync(file);
+                    }
+                }
+            }
+        }
+
+        private async Task AddGcodeAsync(string filePath)
+        {
+            try
+            {
+                var window = new AddGcodeWindow(filePath)
+                {
+                    Owner = this
+                };
+                if (window.ShowDialog() == true)
+                {
+                    var gcode = window.CreatedGcode;
+
+                    // FolderId dışarıdan atanıyor
+                    gcode.ModelId = Model.Id;
+
+                    _context.Gcodes.Add(gcode);
+                    await _context.SaveChangesAsync();
+                    // UI güncelle
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        Model.Gcodes.Add(gcode);
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Gcode eklenirken hata: " + ex.Message);
+            }
         }
     }
 }
